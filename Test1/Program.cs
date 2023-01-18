@@ -10,7 +10,7 @@ class Test
     public static void Main()
     {
         const string PATH = @"L:\TestSaber\test.csv";
-        int count = 5;
+        int count = 5; // count of nodes
 
         //Creating a List
         ListRand listRand = new ListRand();
@@ -59,11 +59,11 @@ class Test
         public void Serialize(FileStream s)
         {
             using (s)
-            {
-                //Rand index, Data
+            {                
                 ListNode next = Head;
                 while (next != null)
                 {
+                    //Rand node index, Data
                     AddText(s, (GetNodeNumIn(this, next.Rand).ToString() + "," + next.Data.ToString() + "\n"));
                     next = next.Next;
                 }
