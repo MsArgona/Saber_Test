@@ -32,13 +32,20 @@ class Test
 
         //Serialize
         FileStream s = File.Create(PATH);
-        listRand.Serialize(s);
+        using (s)
+        {
+            listRand.Serialize(s);
+        }
 
         //Deserialize
         s = File.OpenRead(PATH);
         ListRand newListRand = new ListRand();
-        newListRand.Deserialize(s);
+        using (s)
+        {
+            newListRand.Deserialize(s);
+        }
 
+        Console.WriteLine("\nDeserialize");
         PrintList(newListRand.Head);
     }
 
@@ -58,15 +65,29 @@ class Test
 
         public void Serialize(FileStream s)
         {
-            using (s)
-            {                
-                ListNode next = Head;
-                while (next != null)
-                {
-                    //Rand node index, Data
-                    AddText(s, (GetNodeNumIn(this, next.Rand).ToString() + "," + next.Data.ToString() + "\n"));
-                    next = next.Next;
-                }
+            //Node, Index, Rand
+            Dictionary<ListNode, Tuple<int, ListNode>> tmpDictionary = new Dictionary<ListNode, Tuple<int, ListNode>>();
+
+            //Fill Dictionary
+            ListNode next = Head;
+            int index = 0;
+            while (next != null)
+            {
+                //Node, Index, Rand
+                tmpDictionary.Add(next, new(index, next.Rand));
+                next = next.Next;
+                index++;
+            }
+
+            //Write Rand id and Data from the Dictionary
+            next = Head;
+            index = 0;
+            while (next != null)
+            {
+                //Rand node index, Data
+                AddText(s, (tmpDictionary[tmpDictionary[next].Item2].Item1.ToString() + "," + next.Data.ToString() + "\n"));
+                next = next.Next;
+                index++;
             }
         }
 
@@ -157,10 +178,12 @@ class Test
 
     private static void PrintList(ListNode startNode)
     {
+        Console.WriteLine("\nData\tRand.Data\n");
+
         ListNode next = startNode;
         while (next != null)
         {
-            Console.WriteLine(next.Data);
+            Console.Write($"{next.Data}\t{next.Rand.Data}\n");
             next = next.Next;
         }
     }
